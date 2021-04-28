@@ -18,14 +18,15 @@ const connection = mysql.createConnection({
 
   connection.connect((err) => {
     if (err) throw err;
-    figlet('Employee \nManager', (err, data) => {
-      if (err) throw err;
-      console.log(data, '\n\n--------------------------------------------------------\n\n');
-    });
     start();
   });
 
   const start = () => {
+    figlet('Employee \nManager', (err, data) => {
+      if (err) throw err;
+      console.log(data);
+    });
+    console.log('\n\n---------------------------------------------------------------\n\n');
       inquirer.prompt({
         name: 'action',
         type: 'list',
