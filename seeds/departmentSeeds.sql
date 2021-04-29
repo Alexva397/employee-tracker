@@ -10,4 +10,3 @@ VALUES
     ('Production & Manufacturing'),
     ('Operations'),
     ('Information Technologies');
-
