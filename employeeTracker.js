@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-var figlet = require('figlet');
+const cTable = require('console.table');
+// var figlet = require('figlet');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -22,10 +23,11 @@ const connection = mysql.createConnection({
   });
 
   const start = () => {
-    figlet('Employee \nManager', (err, data) => {
-      if (err) throw err;
-      console.log(data);
-    });
+    // figlet('Employee \nManager', (err, data) => {
+    //   if (err) throw err;
+    //   console.log(data);
+    // });
+    consol.log('Employee Manager');
     console.log('\n\n---------------------------------------------------------------\n\n');
       inquirer.prompt({
         name: 'action',
@@ -45,18 +47,25 @@ const connection = mysql.createConnection({
       .then((answers) => {
         switch (answers.action) {
           case 'View All Employees':
+            viewAllEmp();
             break;
           case 'View All Employees By Department':
-            break;
+            viewByDept();
+            break;            
           case 'View All Employees By Manager':
+            viewByManager();
             break;
           case 'Add Employee':
+            addEmp();
             break;
           case 'Remove Employee':
+            remEmp();
             break;
           case 'Update Employee Role':
+            updateEmpRole();
             break;
           case 'Update Employee Manager':
+            updateEmpManager();
             break;
           case 'Exit':
             connection.end();
@@ -68,3 +77,31 @@ const connection = mysql.createConnection({
         }
       });
   }
+
+  const viewAllEmp = () => {
+    connection.query('SELECT * FROM employee', (err, res) => {
+      if (err) throw err;
+      console.log(res);
+      start();
+    });
+  };
+
+  const viewByDept = () => {
+
+  };
+  
+  const viewByManager = () => {
+    
+  };
+  const addEmp = () => {
+    
+  };
+  const remEmp = () => {
+    
+  };
+  const updateEmpRole = () => {
+    
+  };
+  const updateEmpManager = () => {
+    
+  };
