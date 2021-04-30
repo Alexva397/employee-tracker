@@ -19,15 +19,15 @@ const connection = mysql.createConnection({
 
   connection.connect((err) => {
     if (err) throw err;
+        // figlet('Employee \nManager', (err, data) => {
+    //   if (err) throw err;
+    //   console.log(data);
+    // });
+    console.log('Employee Manager');
     start();
   });
 
   const start = () => {
-    // figlet('Employee \nManager', (err, data) => {
-    //   if (err) throw err;
-    //   console.log(data);
-    // });
-    consol.log('Employee Manager');
     console.log('\n\n---------------------------------------------------------------\n\n');
       inquirer.prompt({
         name: 'action',
@@ -79,9 +79,17 @@ const connection = mysql.createConnection({
   }
 
   const viewAllEmp = () => {
-    connection.query('SELECT * FROM employee', (err, res) => {
+    const query = `
+    SELECT employee.id AS ID, employee.first_name, employee.last_name, role.title AS Title, department.name AS Department, CONCAT('$ ', role.salary) AS Salary, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager
+    FROM employee
+    LEFT JOIN role ON employee.role_id = role.id
+    LEFT JOIN department ON role.department_id = department.id
+    LEFT JOIN employee manager ON manager.id = employee.manager_id`;
+
+    connection.query(query, (err, res) => {
       if (err) throw err;
-      console.log(res);
+      // console.log(res);
+      console.table(res);
       start();
     });
   };
