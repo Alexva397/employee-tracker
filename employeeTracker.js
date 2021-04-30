@@ -59,7 +59,7 @@ const start = () => {
           addEmp();
           break;
         case 'Remove Employee':
-          remEmp();
+          removeEmp();
           break;
         case 'Update Employee Role':
           updateEmpRole();
@@ -125,22 +125,46 @@ const viewByDept = () => {
         start();
       });
     })
-
 };
 
 const viewByManager = () => {
-  // inquirer.prompt({})
+  const query = `
+  SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS name FROM employee
+  LEFT JOIN role ON employee.role_id = role.id
+  LEFT JOIN employee manager ON manager.id = employee.manager_id
+  LEFT JOIN department ON role.department_id = department.id
+  WHERE department.id = 1;`;
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    console.log(res);
+    // console.table(res);
+  inquirer.prompt({
+    name: 'viewManager',
+    type: 'list',
+    message: 'Please select a manager to view their employees.',
+    choices() {
+      const choiceArray = [];
+      res.forEach(({ name }) => {
+        choiceArray.push(name);
+      });
+      return choiceArray;
+    },
+  })
+  });
+  
+
 
 };
-const addEmp = () => {
 
-};
-const remEmp = () => {
+// const addEmp = () => {
 
-};
-const updateEmpRole = () => {
+// };
+// const removeEmp = () => {
 
-};
-const updateEmpManager = () => {
+// };
+// const updateEmpRole = () => {
 
-};
+// };
+// const updateEmpManager = () => {
+
+// };
