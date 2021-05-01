@@ -47,6 +47,7 @@ const start = () => {
       'View All Departments',
       'View All Roles',
       'Add Employee',
+      'Add Role',
       'Add Department',
       'Remove Employee',
       'Update Employee Role',
@@ -73,6 +74,9 @@ const start = () => {
             break;
         case 'Add Employee':
           addEmp();
+          break;
+        case 'Add Role':
+          addRole();
           break;
         case 'Add Department':
           addDept();
@@ -269,6 +273,49 @@ const updateEmpRole = () => {
 
 
 // };
+
+const addRole = () => {
+  connection.query('SELECT name AS department, id as department_id FROM department', (err, res) => {
+    if (err) throw err;
+    inquirer.prompt([
+      {
+        name: 'roleTitle',
+        type: 'input',
+        message: 'Please input the title of the new position you would like to create.',
+      },
+      {
+        name: 'salary',
+        type: 'input',
+        message: 'Please input the starting salary for this role.',
+      },
+      {
+        name: 'deptList',
+        type: 'list',
+        message: 'Please Select the department that the position is within.',
+        choices() {
+          const choiceArray = [];
+          res.forEach(({ department_id, department }) => {
+            const deptInfo = `${department_id} - ${department}`;
+            choiceArray.push(deptInfo);
+          });
+          return choiceArray;
+        },
+      },
+    ])
+    .then((answers) => {
+      connection.query('INSERT INTO role SET ?', 
+      {
+        title: answers.roleTitle,
+        salary: answers.salary,
+        department_id: answers.deptList[0],
+      },
+      (err) => {
+        if (err) throw err;
+        console.log(`${answers.roleTitle} successfully created.`);
+      });
+    });
+  });
+};
 
 const addDept = () => {
   inquirer.prompt({
