@@ -69,9 +69,9 @@ const start = () => {
         case 'View All Departments':
           viewAllDept();
           break;
-          case 'View All Roles':
-            viewAllRoles();
-            break;
+        case 'View All Roles':
+          viewAllRoles();
+          break;
         case 'Add Employee':
           addEmp();
           break;
@@ -214,6 +214,44 @@ const viewByManager = () => {
 //   });
 // };
 
+const addEmp = () => {
+  const query = `
+    SELECT title AS role, id as role_id FROM role;`;
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    // console.table(res);
+    inquirer.prompt([
+      {
+        name: 'addEmpFN',
+        type: 'input',
+        message: 'Please provide their first name.',
+      },
+      {
+        name: 'addEmpLN',
+        type: 'input',
+        message: 'Please provide their last name.',
+      },
+      {
+        name: 'addEmpRole',
+        type: 'list',
+        message: 'Please choose a role for the new employee.',
+        choices() {
+          const roleChoices = [];
+          res.forEach(({ role, role_id }) => {
+            const roleInfo = `${role_id} - ${role}`;
+            roleChoices.push(roleInfo);
+          });
+          return roleChoices;
+        }
+      },
+    ])
+    // .then((answers) => {
+    //   console.log(answers.addEmpRole);
+    // });
+  });
+};
+
+
 const removeEmp = () => {
   connection.query(allEmpQuery, (err, res) => {
     if (err) throw err;
@@ -302,18 +340,18 @@ const addRole = () => {
         },
       },
     ])
-    .then((answers) => {
-      connection.query('INSERT INTO role SET ?', 
-      {
-        title: answers.roleTitle,
-        salary: answers.salary,
-        department_id: answers.deptList[0],
-      },
-      (err) => {
-        if (err) throw err;
-        console.log(`${answers.roleTitle} successfully created.`);
+      .then((answers) => {
+        connection.query('INSERT INTO role SET ?',
+          {
+            title: answers.roleTitle,
+            salary: answers.salary,
+            department_id: answers.deptList[0],
+          },
+          (err) => {
+            if (err) throw err;
+            console.log(`${answers.roleTitle} successfully created.`);
+          });
       });
-    });
   });
 };
 
