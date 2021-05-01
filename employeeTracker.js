@@ -3,6 +3,13 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 var figlet = require('figlet');
 
+const allEmpQuery = `
+SELECT employee.id AS id, employee.first_name, employee.last_name, role.title AS Title, department.name AS Department, CONCAT('$ ', role.salary) AS Salary, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager
+FROM employee
+LEFT JOIN role ON employee.role_id = role.id
+LEFT JOIN department ON role.department_id = department.id
+LEFT JOIN employee manager ON manager.id = employee.manager_id`;
+
 const connection = mysql.createConnection({
   host: 'localhost',
 
@@ -19,11 +26,11 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) throw err;
-  figlet('Employee \nManager', (err, data) => {
-    if (err) throw err;
-    console.log(data);
-  });
-  // console.log('Employee Manager');
+  // figlet('Employee \nManager', (err, data) => {
+  //   if (err) throw err;
+  //   console.log(data);
+  // });
+  console.log('Employee Manager');
   start();
 });
 
@@ -79,16 +86,10 @@ const start = () => {
 }
 
 const viewAllEmp = () => {
-  const query = `
-    SELECT employee.id AS ID, employee.first_name, employee.last_name, role.title AS Title, department.name AS Department, CONCAT('$ ', role.salary) AS Salary, CONCAT(manager.first_name, ' ', manager.last_name) AS Manager
-    FROM employee
-    LEFT JOIN role ON employee.role_id = role.id
-    LEFT JOIN department ON role.department_id = department.id
-    LEFT JOIN employee manager ON manager.id = employee.manager_id`;
 
-  connection.query(query, (err, res) => {
+  connection.query(allEmpQuery, (err, res) => {
     if (err) throw err;
-    // console.log(res);
+    console.log('\n');
     console.table(res);
     start();
   });
@@ -137,7 +138,7 @@ const viewByManager = () => {
   WHERE department.id = 1;`;
   connection.query(query, (err, res) => {
     if (err) throw err;
-    console.log(res);
+    // console.log(res);
     inquirer.prompt({
       name: 'viewManager',
       type: 'list',
@@ -153,11 +154,11 @@ const viewByManager = () => {
     })
       .then((answers) => {
         const query = `
-        Select
+        SELECT
         employee.id AS id, employee.first_name, employee.last_name, role.title AS Title, department.name AS Department, CONCAT('$ ', role.salary) AS Salary,  CONCAT(manager.first_name, ' ', manager.last_name) AS Manager
         FROM employee
         LEFT JOIN role ON employee.role_id = role.id
-        LEFT JOIN employee manager ON manager.id = employee.manager_id
+        LEFT JOIN employee Manager ON manager.id = employee.manager_id
         LEFT JOIN department ON role.department_id = department.id
         WHERE employee.manager_id = ?;`;
         connection.query(query, (answers.viewManager[0]), (err, res) => {
@@ -170,33 +171,62 @@ const viewByManager = () => {
   });
 };
 
-const addEmp = () => {
-  const query = `
-  SELECT`;
+// const addEmp = () => {
+//   const query = `
+//   SELECT role.title AS Title, employee.id AS id, CONCAT(employee.first_name, ' ', employee.last_name) AS name
+//   FROM employee
+//   INNER JOIN role on employee.role_id = role.id
+//   LEFT JOIN employee Manager ON manager.id = employee.manager_id
+//   LEFT JOIN department ON role.department_id = department.id
+//   WHERE department.id = 1;`;
 
-  connection.query(query, (err, res) => {
-    if (err) throw err;
-    // console.log(res);
-    inquirer.prompt([
-      {
-        name: 'addEmpFN',
-        type: 'input',
-        message: 'Please provide their first name.',
-      },
-      {
-        name: 'addEmpLN',
-        type: 'input',
-        message: 'Please provide their last name.',
-      },
-    ])
-  });
-
-};
-
-// const removeEmp = () => {
-
-
+//   connection.query(query, (err, res) => {
+//     if (err) throw err;
+//     console.table(res);
+//     // inquirer.prompt([
+//     //   {
+//     //     name: 'addEmpFN',
+//     //     type: 'input',
+//     //     message: 'Please provide their first name.',
+//     //   },
+//     //   {
+//     //     name: 'addEmpLN',
+//     //     type: 'input',
+//     //     message: 'Please provide their last name.',
+//     //   },
+//     // ])
+//   });
 // };
+
+const removeEmp = () => {
+  connection.query(allEmpQuery, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    inquirer.prompt({
+      name: 'removeEmp',
+      type: 'list',
+      message: 'Please select an employee by ID to remove.',
+      choices() {
+        const choiceArray = [];
+        res.forEach(({ id }) => {
+          choiceArray.push(id);
+        });
+        return choiceArray;
+      },
+    })
+    .then((answers) => {
+      const query = `
+      DELETE FROM employee
+      WHERE employee.id = ${answers.removeEmp};`;
+      connection.query(query, (err, res) => {
+        if (err) throw err;
+        // console.log(res);
+        console.log(`\n\nID: ${answers.removeEmp} successfully removed from database.`);
+        start();
+      });
+    });
+  });
+};
 
 // const updateEmpRole = () => {
 
