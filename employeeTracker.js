@@ -45,6 +45,7 @@ const start = () => {
       'View All Employees By Department',
       'View All Employees By Manager',
       'Add Employee',
+      'Add Department',
       'Remove Employee',
       'Update Employee Role',
       'Update Employee Manager',
@@ -64,6 +65,9 @@ const start = () => {
           break;
         case 'Add Employee':
           addEmp();
+          break;
+        case 'Add Department':
+          addDept();
           break;
         case 'Remove Employee':
           removeEmp();
@@ -214,26 +218,64 @@ const removeEmp = () => {
         return choiceArray;
       },
     })
-    .then((answers) => {
-      const query = `
+      .then((answers) => {
+        const query = `
       DELETE FROM employee
       WHERE employee.id = ${answers.removeEmp};`;
-      connection.query(query, (err, res) => {
-        if (err) throw err;
-        // console.log(res);
-        console.log(`\n\nID: ${answers.removeEmp} successfully removed from database.`);
-        start();
+        connection.query(query, (err, res) => {
+          if (err) throw err;
+          // console.log(res);
+          console.log(`\n\nID: ${answers.removeEmp} successfully removed from database.`);
+          start();
+        });
       });
-    });
   });
 };
 
-// const updateEmpRole = () => {
+const updateEmpRole = () => {
+  // connection.query(allEmpQuery, (err, res) => {
+  //   if (err) throw err;
+  //   console.table(res);
+  //   inquirer.prompt({
+  //     name: 'empRole',
+  //     type: 'list',
+  //     message: 'Please select an employee by ID to Update their role.',
+  //     choices() {
+  //       const choiceArray = [];
+  //       res.forEach(({ id }) => {
+  //         choiceArray.push(id);
+  //       });
+  //       return choiceArray;
+  //     },
+  //   })
+  //   .then((answers) => {
 
-
-// };
+  //   });
+  // });
+  const query = `SELECT concat(employee.first_name, ' ', employee.last_name) AS name, role.title AS postion
+  FROM employee 
+  RIGHT JOIN role ON role.id = employee.role_id;`
+};
 
 // const updateEmpManager = () => {
 
 
 // };
+
+const addDept = () => {
+  inquirer.prompt({
+    name: 'addDepartment',
+    type: 'input',
+    message: 'Please provide the name of the department you would like to add.',
+  })
+    .then((answers) => {
+      connection.query('INSERT INTO department SET ?',
+        {
+          name: answers.addDepartment
+        },
+        (err) => {
+          if (err) throw err;
+          console.log(`${answers.addDepartment} department successfully created.`);
+        });
+    });
+};
