@@ -44,6 +44,8 @@ const start = () => {
       'View All Employees',
       'View All Employees By Department',
       'View All Employees By Manager',
+      'View All Departments',
+      'View All Roles',
       'Add Employee',
       'Add Department',
       'Remove Employee',
@@ -63,6 +65,12 @@ const start = () => {
         case 'View All Employees By Manager':
           viewByManager();
           break;
+        case 'View All Departments':
+          viewAllDept();
+          break;
+          case 'View All Roles':
+            viewAllRoles();
+            break;
         case 'Add Employee':
           addEmp();
           break;
@@ -276,6 +284,23 @@ const addDept = () => {
         (err) => {
           if (err) throw err;
           console.log(`${answers.addDepartment} department successfully created.`);
+          start();
         });
     });
+};
+
+const viewAllDept = () => {
+  connection.query('SELECT * FROM department', (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    start();
+  });
+};
+
+const viewAllRoles = () => {
+  connection.query('SELECT * FROM role', (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    start();
+  });
 };
