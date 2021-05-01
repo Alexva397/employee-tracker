@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-// var figlet = require('figlet');
+var figlet = require('figlet');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -19,11 +19,11 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
   if (err) throw err;
-  // figlet('Employee \nManager', (err, data) => {
-  //   if (err) throw err;
-  //   console.log(data);
-  // });
-  console.log('Employee Manager');
+  figlet('Employee \nManager', (err, data) => {
+    if (err) throw err;
+    console.log(data);
+  });
+  // console.log('Employee Manager');
   start();
 });
 
@@ -129,7 +129,8 @@ const viewByDept = () => {
 
 const viewByManager = () => {
   const query = `
-  SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS name FROM employee
+  SELECT employee.id AS id, CONCAT(employee.first_name, ' ', employee.last_name) AS name
+  FROM employee
   LEFT JOIN role ON employee.role_id = role.id
   LEFT JOIN employee manager ON manager.id = employee.manager_id
   LEFT JOIN department ON role.department_id = department.id
@@ -137,34 +138,72 @@ const viewByManager = () => {
   connection.query(query, (err, res) => {
     if (err) throw err;
     console.log(res);
-    // console.table(res);
-  inquirer.prompt({
-    name: 'viewManager',
-    type: 'list',
-    message: 'Please select a manager to view their employees.',
-    choices() {
-      const choiceArray = [];
-      res.forEach(({ name }) => {
-        choiceArray.push(name);
+    inquirer.prompt({
+      name: 'viewManager',
+      type: 'list',
+      message: 'Please select a manager to view their employees.',
+      choices() {
+        const choiceArray = [];
+        res.forEach(({ id, name }) => {
+          const mngInfo = `${id} - ${name}`;
+          choiceArray.push(mngInfo);
+        });
+        return choiceArray;
+      },
+    })
+      .then((answers) => {
+        const query = `
+        Select
+        employee.id AS id, employee.first_name, employee.last_name, role.title AS Title, department.name AS Department, CONCAT('$ ', role.salary) AS Salary,  CONCAT(manager.first_name, ' ', manager.last_name) AS Manager
+        FROM employee
+        LEFT JOIN role ON employee.role_id = role.id
+        LEFT JOIN employee manager ON manager.id = employee.manager_id
+        LEFT JOIN department ON role.department_id = department.id
+        WHERE employee.manager_id = ?;`;
+        connection.query(query, (answers.viewManager[0]), (err, res) => {
+          if (err) throw err;
+          // console.log(res);
+          console.table(res);
+          start();
+        });
       });
-      return choiceArray;
-    },
-  })
   });
-  
+};
 
+const addEmp = () => {
+  const query = `
+  SELECT`;
+
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    // console.log(res);
+    inquirer.prompt([
+      {
+        name: 'addEmpFN',
+        type: 'input',
+        message: 'Please provide their first name.',
+      },
+      {
+        name: 'addEmpLN',
+        type: 'input',
+        message: 'Please provide their last name.',
+      },
+    ])
+  });
 
 };
 
-// const addEmp = () => {
-
-// };
 // const removeEmp = () => {
 
-// };
-// const updateEmpRole = () => {
 
 // };
+
+// const updateEmpRole = () => {
+
+
+// };
+
 // const updateEmpManager = () => {
+
 
 // };
