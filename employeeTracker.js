@@ -72,9 +72,9 @@ const start = () => {
         case 'View All Roles':
           viewAllRoles();
           break;
-        // case 'Add Employee':
-        //   addEmp();
-        //   break;
+        case 'Add Employee':
+          addEmp();
+          break;
         case 'Add Role':
           addRole();
           break;
@@ -84,12 +84,12 @@ const start = () => {
         case 'Remove Employee':
           removeEmp();
           break;
-        // case 'Update Employee Role':
-        //   updateEmpRole();
-        //   break;
-        // case 'Update Employee Manager':
-        //   updateEmpManager();
-        //   break;
+        case 'Update Employee Role':
+          updateEmpRole();
+          break;
+        case 'Update Employee Manager':
+          updateEmpManager();
+          break;
         case 'Exit':
           connection.end();
           break;
@@ -187,69 +187,42 @@ const viewByManager = () => {
   });
 };
 
-// const addEmp = () => {
-//   const query = `
-//   SELECT role.title AS Title, employee.id AS id, CONCAT(employee.first_name, ' ', employee.last_name) AS name
-//   FROM employee
-//   INNER JOIN role on employee.role_id = role.id
-//   LEFT JOIN employee Manager ON manager.id = employee.manager_id
-//   LEFT JOIN department ON role.department_id = department.id
-//   WHERE department.id = 1;`;
-
-//   connection.query(query, (err, res) => {
-//     if (err) throw err;
-//     console.table(res);
-//     // inquirer.prompt([
-//     //   {
-//     //     name: 'addEmpFN',
-//     //     type: 'input',
-//     //     message: 'Please provide their first name.',
-//     //   },
-//     //   {
-//     //     name: 'addEmpLN',
-//     //     type: 'input',
-//     //     message: 'Please provide their last name.',
-//     //   },
-//     // ])
-//   });
-// };
-
-// const addEmp = () => {
-//   const query = `
-//     SELECT title AS role, id as role_id FROM role;`;
-//   connection.query(query, (err, res) => {
-//     if (err) throw err;
-//     // console.table(res);
-//     inquirer.prompt([
-//       {
-//         name: 'addEmpFN',
-//         type: 'input',
-//         message: 'Please provide their first name.',
-//       },
-//       {
-//         name: 'addEmpLN',
-//         type: 'input',
-//         message: 'Please provide their last name.',
-//       },
-//       {
-//         name: 'addEmpRole',
-//         type: 'list',
-//         message: 'Please choose a role for the new employee.',
-//         choices() {
-//           const roleChoices = [];
-//           res.forEach(({ role, role_id }) => {
-//             const roleInfo = `${role_id} - ${role}`;
-//             roleChoices.push(roleInfo);
-//           });
-//           return roleChoices;
-//         }
-//       },
-//     ])
-//     // .then((answers) => {
-//     //   console.log(answers.addEmpRole);
-//     // });
-//   });
-// };
+const addEmp = () => {
+  const query = `
+    SELECT title, id as role_id FROM role;`;
+  connection.query(query, (err, res) => {
+    if (err) throw err;
+    console.table(res);
+    inquirer.prompt([
+      {
+        name: 'addEmpFN',
+        type: 'input',
+        message: 'Please provide their first name.',
+      },
+      {
+        name: 'addEmpLN',
+        type: 'input',
+        message: 'Please provide their last name.',
+      },
+      {
+        name: 'addEmpRole',
+        type: 'list',
+        message: 'Please choose a role for the new employee.',
+        choices() {
+          const roleChoices = [];
+          res.forEach(({ title, role_id }) => {
+            // const roleInfo = `${role_id} - ${role}`;
+            roleChoices.push(title, role_id);
+          });
+          return roleChoices;
+        }
+      },
+    ])
+      .then((answers) => {
+        console.log(answers);
+      });
+  });
+};
 
 
 const removeEmp = () => {
@@ -283,34 +256,85 @@ const removeEmp = () => {
 };
 
 // const updateEmpRole = () => {
-//   // connection.query(allEmpQuery, (err, res) => {
-//   //   if (err) throw err;
-//   //   console.table(res);
-//   //   inquirer.prompt({
-//   //     name: 'empRole',
-//   //     type: 'list',
-//   //     message: 'Please select an employee by ID to Update their role.',
-//   //     choices() {
-//   //       const choiceArray = [];
-//   //       res.forEach(({ id }) => {
-//   //         choiceArray.push(id);
-//   //       });
-//   //       return choiceArray;
-//   //     },
-//   //   })
-//   //   .then((answers) => {
+//   connection.query(allEmpQuery, (err, res) => {
+//     if (err) throw err;
+//     console.table(res);
+//     inquirer.prompt({
+//       name: 'empRole',
+//       type: 'list',
+//       message: 'Please select an employee by ID to Update their role.',
+//       choices() {
+//         const choiceArray = [];
+//         res.forEach(({ id }) => {
+//           choiceArray.push(id);
+//         });
+//         return choiceArray;
+//       },
+//     })
+//     .then((answers) => {
 
-//   //   });
-//   // });
+//     });
+//   });
 //   const query = `SELECT concat(employee.first_name, ' ', employee.last_name) AS name, role.title AS postion
 //   FROM employee 
 //   RIGHT JOIN role ON role.id = employee.role_id;`
 // };
 
-// const updateEmpManager = () => {
+const updateEmpManager = () => {
+  connection.query(`SELECT * FROM employee
+    INNER JOIN role ON employee.role_id = role.id
+    WHERE (department_id != 1);`, (err, res) => {
+    if (err) throw err;
+    const empForUpdate = res.map(employee => {
+      return {
+        value: employee.id,
+        name: `${employee.first_name} ${employee.last_name}`,
+      };
+    });
+    connection.query(`SELECT * FROM employee
+      INNER JOIN role ON employee.role_id = role.id
+      WHERE (department_id = 1);`, (err, res) => {
+      if (err) throw err;
+      const mngForUpdate = res.map(employee => {
+        return {
+          value: employee.id,
+          name: `${employee.first_name} ${employee.last_name}`,
+        };
+      });
+      inquirer.prompt([
+        {
+          name: 'empSelect',
+          type: 'list',
+          message: 'Please select an employee to update their manager.',
+          choices: empForUpdate,
+        },
+        {
+          name: 'mngSelect',
+          type: 'list',
+          message: 'Please select their new manager.',
+          choices: mngForUpdate,
+        },
+      ])
+        .then((answers) => {
+          console.log(answers);
 
-
-// };
+          let userInput = [
+            {
+              manager_id: answers.mngSelect
+            },
+            {
+              id: answers.employee_id
+            }
+          ];
+          connection.query('UPDATE employee SET ? WHERE ?', userInput, (err) => {
+            if (err) throw err;
+            console.log('\n\nSuccessfully updated manager.');
+            start();
+          });
+        });
+    });
+  });
+};
 
 const addRole = () => {
   connection.query('SELECT name AS department, id as department_id FROM department', (err, res) => {
