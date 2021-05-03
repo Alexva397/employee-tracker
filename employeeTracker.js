@@ -46,11 +46,11 @@ const start = () => {
       'View All Employees By Manager',
       'View All Departments',
       'View All Roles',
-      'Add Employee',
+      // 'Add Employee',
       'Add Role',
       'Add Department',
       'Remove Employee',
-      'Update Employee Role',
+      // 'Update Employee Role',
       'Update Employee Manager',
       'Exit',
     ],
@@ -72,9 +72,9 @@ const start = () => {
         case 'View All Roles':
           viewAllRoles();
           break;
-        case 'Add Employee':
-          addEmp();
-          break;
+        // case 'Add Employee':
+        //   addEmp();
+        //   break;
         case 'Add Role':
           addRole();
           break;
@@ -84,9 +84,9 @@ const start = () => {
         case 'Remove Employee':
           removeEmp();
           break;
-        case 'Update Employee Role':
-          updateEmpRole();
-          break;
+        // case 'Update Employee Role':
+        //   updateEmpRole();
+        //   break;
         case 'Update Employee Manager':
           updateEmpManager();
           break;
@@ -187,42 +187,42 @@ const viewByManager = () => {
   });
 };
 
-const addEmp = () => {
-  const query = `
-    SELECT title, id as role_id FROM role;`;
-  connection.query(query, (err, res) => {
-    if (err) throw err;
-    console.table(res);
-    inquirer.prompt([
-      {
-        name: 'addEmpFN',
-        type: 'input',
-        message: 'Please provide their first name.',
-      },
-      {
-        name: 'addEmpLN',
-        type: 'input',
-        message: 'Please provide their last name.',
-      },
-      {
-        name: 'addEmpRole',
-        type: 'list',
-        message: 'Please choose a role for the new employee.',
-        choices() {
-          const roleChoices = [];
-          res.forEach(({ title, role_id }) => {
-            // const roleInfo = `${role_id} - ${role}`;
-            roleChoices.push(title, role_id);
-          });
-          return roleChoices;
-        }
-      },
-    ])
-      .then((answers) => {
-        console.log(answers);
-      });
-  });
-};
+// const addEmp = () => {
+//   const query = `
+//     SELECT title, id as role_id FROM role;`;
+//   connection.query(query, (err, res) => {
+//     if (err) throw err;
+//     console.table(res);
+//     inquirer.prompt([
+//       {
+//         name: 'addEmpFN',
+//         type: 'input',
+//         message: 'Please provide their first name.',
+//       },
+//       {
+//         name: 'addEmpLN',
+//         type: 'input',
+//         message: 'Please provide their last name.',
+//       },
+//       {
+//         name: 'addEmpRole',
+//         type: 'list',
+//         message: 'Please choose a role for the new employee.',
+//         choices() {
+//           const roleChoices = [];
+//           res.forEach(({ title, role_id }) => {
+//             // const roleInfo = `${role_id} - ${role}`;
+//             roleChoices.push(title, role_id);
+//           });
+//           return roleChoices;
+//         }
+//       },
+//     ])
+//       .then((answers) => {
+//         console.log(answers);
+//       });
+//   });
+// };
 
 
 const removeEmp = () => {
