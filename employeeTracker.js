@@ -30,7 +30,7 @@ connection.connect((err) => {
   //   if (err) throw err;
   //   console.log(data);
   // });
-  console.log('Employee Manager');
+  console.log('\n\nEmployee Manager');
   start();
 });
 
@@ -375,6 +375,7 @@ const addRole = () => {
             if (err) throw err;
             console.log(`${answers.roleTitle} successfully created.`);
           });
+          start();
       });
   });
 };
